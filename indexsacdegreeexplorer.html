@@ -1,0 +1,1082 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>What Is a Degree? — Math 172, SAC</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #17171b;
+    --panel: #201f25;
+    --panel-2: #26252c;
+    --border: #37363f;
+    --text: #f2f0ea;
+    --text-dim: #a8a6b3;
+    --crimson: #c8102e;
+    --crimson-dim: #7d0a1e;
+    --teal: #2dd4bf;
+    --gold: #d4a017;
+    --pink: #ec6fa8;
+    --scale: 1;
+    --radius: 14px;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0; background: var(--bg); color: var(--text);
+    font-family: 'DM Sans', system-ui, sans-serif;
+    font-size: calc(16px * var(--scale));
+  }
+  .mono { font-family: 'DM Mono', monospace; }
+
+  .skip-link {
+    position: absolute; left: -999px; top: 0; background: var(--crimson);
+    color: #fff; padding: 10px 16px; z-index: 100; border-radius: 0 0 8px 0;
+  }
+  .skip-link:focus { left: 0; }
+
+  header {
+    padding: 20px clamp(16px, 4vw, 32px) 12px;
+    border-bottom: 1px solid var(--border);
+  }
+  header .top-row {
+    display: flex; justify-content: space-between; align-items: flex-start;
+    gap: 12px; flex-wrap: wrap;
+  }
+  h1 {
+    font-size: calc(1.4rem * var(--scale)); font-weight: 700; margin: 0 0 4px;
+    letter-spacing: -0.01em;
+  }
+  header p.sub {
+    margin: 0; color: var(--text-dim); font-size: calc(0.92rem * var(--scale));
+    max-width: 60ch;
+  }
+
+  button.mode-toggle {
+    background: var(--panel-2); border: 1px solid var(--border); color: var(--text);
+    padding: 8px 14px; border-radius: 999px; font-family: inherit; font-size: 0.85rem;
+    cursor: pointer; white-space: nowrap; font-weight: 600;
+  }
+  button.mode-toggle[aria-pressed="true"] {
+    background: var(--crimson); border-color: var(--crimson); color: #fff;
+  }
+
+  nav.tabs {
+    display: flex; gap: 6px; padding: 14px clamp(16px, 4vw, 32px) 0;
+    border-bottom: 1px solid var(--border); overflow-x: auto;
+  }
+  nav.tabs button {
+    font-family: inherit; background: transparent; border: none; color: var(--text-dim);
+    padding: 10px 16px; font-size: calc(0.95rem * var(--scale)); font-weight: 600;
+    border-bottom: 3px solid transparent; cursor: pointer; white-space: nowrap;
+  }
+  nav.tabs button[aria-selected="true"] {
+    color: var(--text); border-bottom-color: var(--crimson);
+  }
+  nav.tabs button[disabled] {
+    color: #56545f; cursor: not-allowed;
+  }
+  nav.tabs button .badge {
+    display: inline-block; margin-left: 6px; font-size: 0.65em; font-weight: 700;
+    background: var(--panel-2); color: var(--text-dim); padding: 2px 6px; border-radius: 999px;
+    vertical-align: middle;
+  }
+
+  main {
+    padding: 24px clamp(16px, 4vw, 32px) 40px;
+    max-width: 1140px; margin: 0 auto;
+  }
+
+  .layout {
+    display: grid; grid-template-columns: minmax(320px, 1.5fr) minmax(260px, 1fr);
+    gap: 28px; align-items: start;
+  }
+  body.presenter .layout { grid-template-columns: 1fr; }
+  body.presenter .diagram-panel, body.presenter .controls { max-width: 820px; margin: 0 auto; width: 100%; }
+  @media (max-width: 720px) {
+    .layout { grid-template-columns: 1fr; }
+  }
+
+  .diagram-panel {
+    background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 16px;
+  }
+  svg#triangle-svg, svg#circle-svg { width: 100%; height: auto; touch-action: none; }
+
+  .view { display: none; }
+  .view.active { display: block; }
+
+  .readout {
+    text-align: center; margin-top: 6px;
+  }
+  .readout .deg {
+    font-family: 'DM Mono', monospace; font-size: calc(2.6rem * var(--scale));
+    font-weight: 500; color: var(--crimson); line-height: 1;
+  }
+  .readout .cap { color: var(--text-dim); font-size: calc(0.85rem * var(--scale)); margin-top: 2px; }
+
+  .controls {
+    display: flex; flex-direction: column; gap: 18px;
+  }
+  .control-card {
+    background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 16px 18px;
+  }
+  .control-card h2 {
+    font-size: calc(0.8rem * var(--scale)); text-transform: none; letter-spacing: 0.02em;
+    color: var(--text-dim); margin: 0 0 12px; font-weight: 600;
+  }
+
+  input[type="range"] {
+    width: 100%; accent-color: var(--crimson); height: 24px;
+  }
+
+  .chip-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+  .chip {
+    font-family: 'DM Mono', monospace; font-size: calc(0.85rem * var(--scale));
+    background: var(--panel-2); border: 1px solid var(--border); color: var(--text);
+    padding: 6px 12px; border-radius: 999px; cursor: pointer;
+  }
+  .chip:hover, .chip:focus-visible { border-color: var(--crimson); }
+  .chip[aria-pressed="true"] { background: var(--crimson); border-color: var(--crimson); color: #fff; }
+
+  .switch-row {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  }
+  .switch-row label { font-size: calc(0.9rem * var(--scale)); }
+  .switch {
+    position: relative; width: 44px; height: 24px; flex-shrink: 0;
+  }
+  .switch input { position: absolute; opacity: 0; width: 100%; height: 100%; margin: 0; cursor: pointer; }
+  .switch .track {
+    position: absolute; inset: 0; background: var(--panel-2); border: 1px solid var(--border);
+    border-radius: 999px; transition: background 0.15s;
+  }
+  .switch .thumb {
+    position: absolute; top: 2px; left: 2px; width: 18px; height: 18px; border-radius: 50%;
+    background: var(--text-dim); transition: transform 0.15s, background 0.15s;
+  }
+  .switch input:checked + .track { background: var(--crimson-dim); border-color: var(--crimson); }
+  .switch input:checked + .track + .thumb { transform: translateX(20px); background: var(--crimson); }
+
+  .side-labels {
+    display: flex; gap: 14px; flex-wrap: wrap; margin-top: 14px; font-size: calc(0.8rem * var(--scale));
+  }
+  .side-labels span { display: inline-flex; align-items: center; gap: 6px; color: var(--text-dim); }
+  .swatch { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
+
+  .reflect {
+    background: linear-gradient(180deg, rgba(45,212,191,0.08), rgba(45,212,191,0.02));
+    border: 1px solid rgba(45,212,191,0.35); border-radius: var(--radius);
+    padding: 16px 18px;
+  }
+  .reflect h2 { color: var(--teal); font-size: calc(0.8rem * var(--scale)); margin: 0 0 8px; font-weight: 700; }
+  .reflect p { margin: 0; font-size: calc(0.92rem * var(--scale)); color: var(--text); line-height: 1.5; }
+
+  .hint { color: var(--text-dim); font-size: calc(0.8rem * var(--scale)); margin: 10px 0 0; line-height: 1.4; }
+
+  footer {
+    text-align: center; padding: 22px 16px 30px; color: var(--text-dim);
+    font-size: 0.8rem; border-top: 1px solid var(--border);
+  }
+
+  .visually-hidden {
+    position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap;
+  }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main-content">Skip to main content</a>
+
+<header>
+  <div class="top-row">
+    <div>
+      <h1>What Is a Degree?</h1>
+      <p class="sub">One angle, three ways to see it — starting with a triangle you can pull apart by hand.</p>
+    </div>
+    <button class="mode-toggle" id="mode-toggle" type="button" aria-pressed="false">
+      Presenter Mode: Off
+    </button>
+  </div>
+</header>
+
+<nav class="tabs" aria-label="Angle views">
+  <button role="tab" aria-selected="true" id="tab-triangle" data-view="triangle">Triangle</button>
+  <button role="tab" aria-selected="false" id="tab-circle" data-view="circle">Circle (0&deg;&ndash;90&deg;)</button>
+  <button role="tab" aria-selected="false" id="tab-circlefull" data-view="circlefull">Circle (0&deg;&ndash;360&deg;)</button>
+  <button role="tab" aria-selected="false" id="tab-radians" data-view="radians">Radians</button>
+</nav>
+
+<main id="main-content">
+  <div class="layout">
+    <div class="diagram-panel">
+      <div class="view active" data-view="triangle">
+        <svg id="triangle-svg" viewBox="0 0 640 460" role="img" aria-labelledby="svg-title svg-desc">
+          <title id="svg-title">Right triangle with an adjustable angle</title>
+          <desc id="svg-desc">A right triangle where one angle can be dragged from 0 to 90 degrees. The current angle is read aloud in the heading below the diagram.</desc>
+          <g id="baseline-guide" stroke="#37363f" stroke-width="1.5" stroke-dasharray="4 5"></g>
+          <path id="angle-arc" fill="rgba(200,16,46,0.28)" stroke="var(--crimson)" stroke-width="1.5"></path>
+          <line id="side-adjacent" stroke="var(--teal)" stroke-width="6" stroke-linecap="round"></line>
+          <line id="side-opposite" stroke="var(--gold)" stroke-width="6" stroke-linecap="round"></line>
+          <line id="side-hyp" stroke="var(--pink)" stroke-width="6" stroke-linecap="round"></line>
+          <path id="right-angle-mark" fill="none" stroke="#c9c7d1" stroke-width="2"></path>
+          <text id="theta-label" class="mono" fill="var(--text)" font-size="22" font-weight="600"></text>
+          <circle id="handle" r="15" fill="var(--crimson)" stroke="#fff" stroke-width="2.5" tabindex="0"
+                  role="slider" aria-label="Drag to change the angle. Pull toward or away from the corner to resize. Shift plus arrow keys resizes." aria-valuemin="0" aria-valuemax="90"
+                  style="cursor:grab;"></circle>
+        </svg>
+        <div class="readout" aria-live="polite">
+          <div class="deg mono"><span id="deg-value">35</span>&deg;</div>
+          <div class="cap">Angle at the marked vertex</div>
+        </div>
+      </div>
+
+      <div class="view" data-view="circle">
+        <svg id="circle-svg" viewBox="0 0 780 780" role="img" aria-labelledby="circle-svg-title circle-svg-desc">
+          <title id="circle-svg-title">Circle showing the same angle as a rotation</title>
+          <desc id="circle-svg-desc">The same angle, now swept from the positive x-axis around a circle whose radius matches the triangle's hypotenuse. The current angle is read aloud in the heading below the diagram.</desc>
+          <line id="circle-xaxis" stroke="#37363f" stroke-width="1.5"></line>
+          <line id="circle-yaxis" stroke="#37363f" stroke-width="1.5"></line>
+          <circle id="circle-outline" fill="none" stroke="#4a4852" stroke-width="1.5"></circle>
+          <path id="circle-wedge" fill="rgba(200,16,46,0.22)" stroke="var(--crimson)" stroke-width="1.5"></path>
+          <line id="circle-drop" stroke="#5c5a66" stroke-width="1.5" stroke-dasharray="4 5"></line>
+          <line id="circle-adjacent" stroke="var(--teal)" stroke-width="6" stroke-linecap="round"></line>
+          <line id="circle-opposite" stroke="var(--gold)" stroke-width="6" stroke-linecap="round"></line>
+          <line id="circle-radius" stroke="var(--pink)" stroke-width="6" stroke-linecap="round"></line>
+          <text id="circle-zero-label" class="mono" fill="var(--text-dim)" font-size="15"></text>
+          <text id="circle-ninety-label" class="mono" fill="var(--text-dim)" font-size="15"></text>
+          <text id="circle-theta-label" class="mono" fill="var(--text)" font-size="22" font-weight="600"></text>
+          <circle id="circle-handle" r="15" fill="var(--crimson)" stroke="#fff" stroke-width="2.5" tabindex="0"
+                  role="slider" aria-label="Drag to change the angle" aria-valuemin="0" aria-valuemax="90"
+                  style="cursor:grab;"></circle>
+        </svg>
+        <div class="readout" aria-live="polite">
+          <div class="deg mono"><span id="deg-value-circle">35</span>&deg;</div>
+          <div class="cap">Rotation from the positive x-axis</div>
+        </div>
+      </div>
+
+      <div class="view" data-view="circlefull">
+        <svg id="circlefull-svg" viewBox="0 0 780 780" role="img" aria-labelledby="circlefull-svg-title circlefull-svg-desc">
+          <title id="circlefull-svg-title">Circle showing a full rotation from 0 to 360 degrees</title>
+          <desc id="circlefull-svg-desc">The same idea as the Circle tab, but the point can now travel all the way around, from 0 to 360 degrees. The current angle is read aloud in the heading below the diagram.</desc>
+          <line id="circlefull-xaxis" stroke="#37363f" stroke-width="1.5"></line>
+          <line id="circlefull-yaxis" stroke="#37363f" stroke-width="1.5"></line>
+          <circle id="circlefull-outline" fill="none" stroke="#4a4852" stroke-width="1.5"></circle>
+          <path id="circlefull-wedge" fill="rgba(200,16,46,0.22)" stroke="var(--crimson)" stroke-width="1.5"></path>
+          <text id="circlefull-q1-label" class="mono" fill="#6b6975" font-size="14"></text>
+          <text id="circlefull-q2-label" class="mono" fill="#6b6975" font-size="14"></text>
+          <text id="circlefull-q3-label" class="mono" fill="#6b6975" font-size="14"></text>
+          <text id="circlefull-q4-label" class="mono" fill="#6b6975" font-size="14"></text>
+          <text id="circlefull-0-label" class="mono" fill="var(--text-dim)" font-size="15"></text>
+          <text id="circlefull-90-label" class="mono" fill="var(--text-dim)" font-size="15"></text>
+          <text id="circlefull-180-label" class="mono" fill="var(--text-dim)" font-size="15"></text>
+          <text id="circlefull-270-label" class="mono" fill="var(--text-dim)" font-size="15"></text>
+          <line id="circlefull-radius" stroke="var(--pink)" stroke-width="6" stroke-linecap="round"></line>
+          <text id="circlefull-theta-label" class="mono" fill="var(--text)" font-size="22" font-weight="600"></text>
+          <circle id="circlefull-handle" r="15" fill="var(--crimson)" stroke="#fff" stroke-width="2.5" tabindex="0"
+                  role="slider" aria-label="Drag all the way around, 0 to 360 degrees" aria-valuemin="0" aria-valuemax="360"
+                  style="cursor:grab;"></circle>
+        </svg>
+        <div class="readout" aria-live="polite">
+          <div class="deg mono"><span id="deg-value-circlefull">200</span>&deg;</div>
+          <div class="cap">One full trip around is 360&deg;</div>
+        </div>
+      </div>
+
+      <div class="view" data-view="radians">
+        <svg id="radians-svg" viewBox="0 0 780 780" role="img" aria-labelledby="radians-svg-title radians-svg-desc">
+          <title id="radians-svg-title">Circle showing radians built from the radius</title>
+          <desc id="radians-svg-desc">The radius laid along the circle's edge, over and over, to show that a radian is the angle you get from one radius-length of arc. The current angle is read aloud in the heading below the diagram.</desc>
+          <line id="rad-xaxis" stroke="#37363f" stroke-width="1.5"></line>
+          <line id="rad-yaxis" stroke="#37363f" stroke-width="1.5"></line>
+          <circle id="rad-outline" fill="none" stroke="#4a4852" stroke-width="1.5"></circle>
+          <path id="rad-wedge" fill="rgba(200,16,46,0.22)" stroke="var(--crimson)" stroke-width="1.5"></path>
+          <path id="rad-first-arc" fill="none" stroke="var(--teal)" stroke-width="7" stroke-linecap="round"></path>
+          <line id="rad-reference" stroke="var(--teal)" stroke-width="6" stroke-linecap="round"></line>
+          <text id="rad-reference-label" class="mono" fill="var(--teal)" font-size="14" font-weight="600"></text>
+          <g id="rad-ticks"></g>
+          <line id="rad-radius" stroke="var(--pink)" stroke-width="6" stroke-linecap="round"></line>
+          <text id="rad-theta-label" class="mono" fill="var(--text)" font-size="22" font-weight="600"></text>
+          <circle id="rad-handle" r="15" fill="var(--crimson)" stroke="#fff" stroke-width="2.5" tabindex="0"
+                  role="slider" aria-label="Drag all the way around to build up radians, 0 to 360 degrees" aria-valuemin="0" aria-valuemax="360"
+                  style="cursor:grab;"></circle>
+        </svg>
+        <div class="readout" aria-live="polite">
+          <div class="deg mono"><span id="rad-fraction">&pi;/2</span> rad</div>
+          <div class="cap" id="rad-caption">90&deg; &middot; &#8776; 1.5708 rad</div>
+        </div>
+      </div>
+
+      <div class="side-labels">
+        <span><span class="swatch" style="background:var(--teal);"></span>adjacent</span>
+        <span><span class="swatch" style="background:var(--gold);"></span>opposite</span>
+        <span><span class="swatch" style="background:var(--pink);"></span>hypotenuse / radius</span>
+      </div>
+    </div>
+
+    <div class="controls">
+      <div class="view active control-card" data-view="triangle circle">
+        <h2>Set the angle</h2>
+        <label for="angle-range" class="visually-hidden">Angle in degrees, 0 to 90</label>
+        <input type="range" id="angle-range" min="0" max="90" step="1" value="35">
+
+        <div class="chip-row" id="chip-row">
+          <button class="chip" data-deg="0">0&deg;</button>
+          <button class="chip" data-deg="15">15&deg;</button>
+          <button class="chip" data-deg="30">30&deg;</button>
+          <button class="chip" data-deg="45">45&deg;</button>
+          <button class="chip" data-deg="60">60&deg;</button>
+          <button class="chip" data-deg="75">75&deg;</button>
+          <button class="chip" data-deg="90">90&deg;</button>
+        </div>
+
+        <div class="switch-row" style="margin-top:16px;">
+          <label for="snap-toggle">Snap to these angles while dragging</label>
+          <span class="switch">
+            <input type="checkbox" id="snap-toggle">
+            <span class="track"></span>
+            <span class="thumb"></span>
+          </span>
+        </div>
+      </div>
+
+      <div class="view control-card" data-view="circlefull">
+        <h2>Set the angle (full turn)</h2>
+        <label for="angle-range-full" class="visually-hidden">Angle in degrees, 0 to 360</label>
+        <input type="range" id="angle-range-full" min="0" max="360" step="1" value="200">
+
+        <div class="chip-row" id="chip-row-full">
+          <button class="chip" data-deg="0">0&deg;</button>
+          <button class="chip" data-deg="45">45&deg;</button>
+          <button class="chip" data-deg="90">90&deg;</button>
+          <button class="chip" data-deg="135">135&deg;</button>
+          <button class="chip" data-deg="180">180&deg;</button>
+          <button class="chip" data-deg="225">225&deg;</button>
+          <button class="chip" data-deg="270">270&deg;</button>
+          <button class="chip" data-deg="315">315&deg;</button>
+          <button class="chip" data-deg="360">360&deg;</button>
+        </div>
+
+        <div class="switch-row" style="margin-top:16px;">
+          <label for="snap-toggle-full">Snap to these angles while dragging</label>
+          <span class="switch">
+            <input type="checkbox" id="snap-toggle-full">
+            <span class="track"></span>
+            <span class="thumb"></span>
+          </span>
+        </div>
+      </div>
+
+      <div class="view control-card" data-view="radians">
+        <h2>Set the angle</h2>
+        <label for="angle-range-rad" class="visually-hidden">Angle in degrees, 0 to 360</label>
+        <input type="range" id="angle-range-rad" min="0" max="360" step="1" value="90">
+
+        <div class="chip-row" id="chip-row-rad"></div>
+
+        <div class="switch-row" style="margin-top:16px;">
+          <label for="snap-toggle-rad">Snap to these angles while dragging</label>
+          <span class="switch">
+            <input type="checkbox" id="snap-toggle-rad">
+            <span class="track"></span>
+            <span class="thumb"></span>
+          </span>
+        </div>
+      </div>
+
+      <div class="control-card">
+        <h2>Size</h2>
+        <label for="size-range" class="visually-hidden">Size</label>
+        <input type="range" id="size-range" min="90" max="320" step="1" value="190">
+        <p class="hint">Or grab the point on the triangle itself and pull it toward or away from the corner — the angle stays whatever it was.</p>
+      </div>
+
+      <div class="view active reflect" data-view="triangle">
+        <h2>Check your thinking</h2>
+        <p>Drag from 20&deg; up toward 80&deg;. Before the numbers change, guess: which side grows the whole time, and which side shrinks? Then drag slowly and watch the teal and gold sides to see if you called it.</p>
+      </div>
+
+      <div class="view reflect" data-view="circle">
+        <h2>Check your thinking</h2>
+        <p>Same teal, gold, and pink sides as the triangle — you just spun that triangle around the circle. Drag the point all the way around from 0&deg; to 90&deg;: which one of the three sides never changes length, no matter where the point sits?</p>
+      </div>
+
+      <div class="view reflect" data-view="circlefull">
+        <h2>Check your thinking</h2>
+        <p>This is the same circle, but now the point can go all the way around. Watch it cross 90&deg;, 180&deg;, 270&deg;, and land back at 360&deg; &mdash; right on top of 0&deg;. Where does the point sit at 200&deg;? Which quarter of the circle is that?</p>
+      </div>
+
+      <div class="view reflect" data-view="radians">
+        <h2>Check your thinking</h2>
+        <p>The teal mark is one radius, bent along the circle &mdash; that's what 1 radian actually means. Drag all the way around and try to count how many full radius-lengths fit before you land back at 0&deg;/360&deg;. You'll come up just short of a 7th one &mdash; that leftover sliver is exactly why a full circle is 2&pi; (about 6.28) radians, not a clean whole number.</p>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer>Math 172 &mdash; Precalculus &amp; Trigonometry &nbsp;&bull;&nbsp; v1.4 &nbsp;&bull;&nbsp; Built for Santa Ana College</footer>
+
+<script>
+(function () {
+  "use strict";
+
+  // ---- geometry ----
+  var H = 190;                 // hypotenuse length (px) — now adjustable via the size slider
+  var A = { x: 470, y: 360 };  // fixed angle vertex (does not move as theta OR size changes)
+  var C = { x: 390, y: 390 };  // fixed circle center for the Circle tab
+
+  function degToRad(d) { return d * Math.PI / 180; }
+  function radToDeg(r) { return r * 180 / Math.PI; }
+
+  function gcd(a, b) { return b === 0 ? a : gcd(b, a % b); }
+
+  // Every angle on our sliders is an integer degree, so d/180 is always a
+  // reducible fraction of pi — this gives an exact (not approximated) label.
+  function piFraction(deg) {
+    var d = Math.round(deg);
+    if (d === 0) return "0";
+    var g = gcd(d, 180);
+    var num = d / g, den = 180 / g;
+    var pi = "\u03C0";
+    var numStr = num === 1 ? pi : num + pi;
+    return den === 1 ? numStr : numStr + "/" + den;
+  }
+
+  function computeVertices(thetaDeg) {
+    var th = degToRad(thetaDeg);
+    var R = { x: A.x - H * Math.cos(th), y: A.y };
+    var T = { x: A.x - H * Math.cos(th), y: A.y - H * Math.sin(th) };
+    return { A: A, R: R, T: T };
+  }
+
+  function pointOnCircle(cx, cy, r, gammaDeg) {
+    var g = degToRad(gammaDeg);
+    return { x: cx + r * Math.cos(g), y: cy - r * Math.sin(g) };
+  }
+
+  function sectorPath(cx, cy, radius, fromDeg, toDeg) {
+    var steps = Math.max(2, Math.round(Math.abs(toDeg - fromDeg) / 3));
+    var pts = [];
+    for (var i = 0; i <= steps; i++) {
+      var g = fromDeg + (toDeg - fromDeg) * (i / steps);
+      pts.push(pointOnCircle(cx, cy, radius, g));
+    }
+    var d = "M " + cx + " " + cy;
+    pts.forEach(function (p) { d += " L " + p.x.toFixed(1) + " " + p.y.toFixed(1); });
+    d += " Z";
+    return d;
+  }
+
+  // An open arc (no jump to center, no close) — for drawing just the curved
+  // edge itself, e.g. the first-radian arc laid against the reference radius.
+  function arcStroke(cx, cy, radius, fromDeg, toDeg) {
+    var steps = Math.max(2, Math.round(Math.abs(toDeg - fromDeg) / 3));
+    var d = "";
+    for (var i = 0; i <= steps; i++) {
+      var g = fromDeg + (toDeg - fromDeg) * (i / steps);
+      var p = pointOnCircle(cx, cy, radius, g);
+      d += (i === 0 ? "M " : "L ") + p.x.toFixed(1) + " " + p.y.toFixed(1) + " ";
+    }
+    return d.trim();
+  }
+
+  // ---- state ----
+  var BENCHMARKS = [0, 15, 30, 45, 60, 75, 90];
+  var BENCHMARKS_FULL = [0, 45, 90, 135, 180, 225, 270, 315, 360];
+  // Radians tab benchmark set: the standard unit-circle angles — quarters (pi/4),
+  // thirds (pi/3), and sixths (pi/6) combined and deduplicated.
+  var RADIAN_BENCHMARKS = [0, 30, 45, 60, 90, 120, 135, 150, 180, 210, 225, 240, 270, 300, 315, 330, 360];
+  var theta = 35;
+  var thetaFull = 200;
+  var thetaRad = 90;
+  var radWholeMark = null;   // 1-6 when thetaRad is magnetically on a whole-radian mark, else null
+  var RADIAN_SNAP_TOLERANCE = 2.5; // degrees
+  var RADIAN_MARK_DEGS = [1, 2, 3, 4, 5, 6].map(function (n) { return radToDeg(n); });
+  var snapOn = false;
+  var snapOnFull = false;
+  var snapOnRad = false;
+  var dragging = false;
+
+  var svg = document.getElementById("triangle-svg");
+  var handle = document.getElementById("handle");
+  var range = document.getElementById("angle-range");
+  var rangeFull = document.getElementById("angle-range-full");
+  var rangeRad = document.getElementById("angle-range-rad");
+  var sizeRange = document.getElementById("size-range");
+  var degValue = document.getElementById("deg-value");
+  var degValueCircle = document.getElementById("deg-value-circle");
+  var degValueFull = document.getElementById("deg-value-circlefull");
+  var radFraction = document.getElementById("rad-fraction");
+  var radCaption = document.getElementById("rad-caption");
+  var chips = Array.prototype.slice.call(document.querySelectorAll(".chip-row#chip-row .chip"));
+  var chipsFull = Array.prototype.slice.call(document.querySelectorAll(".chip-row#chip-row-full .chip"));
+
+  // Build the Radians chip row from the benchmark list itself — the label always
+  // comes straight from piFraction, so it can never drift out of sync with the value.
+  (function buildRadChips() {
+    var container = document.getElementById("chip-row-rad");
+    RADIAN_BENCHMARKS.forEach(function (deg) {
+      var btn = document.createElement("button");
+      btn.className = "chip";
+      btn.dataset.deg = String(deg);
+      btn.textContent = piFraction(deg);
+      container.appendChild(btn);
+    });
+  })();
+
+  var chipsRad = Array.prototype.slice.call(document.querySelectorAll(".chip-row#chip-row-rad .chip"));
+  var snapToggle = document.getElementById("snap-toggle");
+  var snapToggleFull = document.getElementById("snap-toggle-full");
+  var snapToggleRad = document.getElementById("snap-toggle-rad");
+  var SIZE_MIN = Number(sizeRange.min), SIZE_MAX = Number(sizeRange.max);
+
+  function nearestBenchmark(t, list) {
+    var options = list || BENCHMARKS;
+    var best = options[0], bestDist = Infinity;
+    options.forEach(function (b) {
+      var d = Math.abs(b - t);
+      if (d < bestDist) { bestDist = d; best = b; }
+    });
+    return best;
+  }
+
+  function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+
+  function render() {
+    var v = computeVertices(theta);
+
+    document.getElementById("side-adjacent").setAttribute("x1", v.A.x);
+    document.getElementById("side-adjacent").setAttribute("y1", v.A.y);
+    document.getElementById("side-adjacent").setAttribute("x2", v.R.x);
+    document.getElementById("side-adjacent").setAttribute("y2", v.R.y);
+
+    document.getElementById("side-opposite").setAttribute("x1", v.R.x);
+    document.getElementById("side-opposite").setAttribute("y1", v.R.y);
+    document.getElementById("side-opposite").setAttribute("x2", v.T.x);
+    document.getElementById("side-opposite").setAttribute("y2", v.T.y);
+
+    document.getElementById("side-hyp").setAttribute("x1", v.A.x);
+    document.getElementById("side-hyp").setAttribute("y1", v.A.y);
+    document.getElementById("side-hyp").setAttribute("x2", v.T.x);
+    document.getElementById("side-hyp").setAttribute("y2", v.T.y);
+
+    var adjacentLen = Math.abs(v.R.x - v.A.x);
+    var oppositeLen = Math.abs(v.T.y - v.R.y);
+
+    var guide = document.getElementById("baseline-guide");
+    guide.innerHTML = "";
+    var baselineEnd = { x: A.x - H - 30, y: A.y };
+    guide.innerHTML =
+      '<line x1="' + A.x + '" y1="' + A.y + '" x2="' + baselineEnd.x + '" y2="' + baselineEnd.y + '"></line>';
+
+    // Arc and label radius scale with the current triangle size, but stay clamped
+    // so they never overshoot a short leg at small-size + extreme-angle combos.
+    var arcR = clamp(Math.min(H * 0.32, adjacentLen * 0.85, oppositeLen * 0.85), 20, 60);
+    var labelR = arcR + 20;
+
+    document.getElementById("angle-arc").setAttribute("d", sectorPath(A.x, A.y, arcR, 180 - theta, 180));
+
+    // right-angle mark: a small square inset from R along each leg, toward A and toward T.
+    // Sized relative to the leg lengths so it always sits fully inside the triangle,
+    // even when one leg is short near the 0deg/90deg ends or the triangle is small.
+    var mark = document.getElementById("right-angle-mark");
+    var s = Math.min(18, adjacentLen * 0.4, oppositeLen * 0.4);
+    if (s > 3) {
+      var signX = Math.sign(v.A.x - v.R.x) || 1;   // toward A along the horizontal leg
+      var signY = Math.sign(v.T.y - v.R.y) || -1;  // toward T along the vertical leg
+      var p1 = { x: v.R.x + signX * s, y: v.R.y };
+      var p2 = { x: p1.x, y: v.R.y + signY * s };
+      var p3 = { x: v.R.x, y: p2.y };
+      mark.setAttribute("d",
+        "M " + p1.x.toFixed(1) + " " + p1.y.toFixed(1) +
+        " L " + p2.x.toFixed(1) + " " + p2.y.toFixed(1) +
+        " L " + p3.x.toFixed(1) + " " + p3.y.toFixed(1));
+      mark.style.display = "";
+    } else {
+      mark.style.display = "none";
+    }
+
+    var labelPos = pointOnCircle(A.x, A.y, labelR, 180 - theta / 2);
+    var label = document.getElementById("theta-label");
+    label.setAttribute("x", labelPos.x - 8);
+    label.setAttribute("y", labelPos.y + 5);
+    label.textContent = Math.round(theta) + "\u00B0";
+
+    handle.setAttribute("cx", v.T.x);
+    handle.setAttribute("cy", v.T.y);
+    handle.setAttribute("aria-valuenow", Math.round(theta));
+    handle.setAttribute("aria-valuetext", Math.round(theta) + " degrees");
+
+    degValue.textContent = Math.round(theta);
+    range.value = theta;
+
+    // ---- circle view (kept in sync even when hidden, so switching tabs is instant) ----
+    var cx = C.x, cy = C.y;
+
+    document.getElementById("circle-xaxis").setAttribute("x1", cx - H - 40);
+    document.getElementById("circle-xaxis").setAttribute("y1", cy);
+    document.getElementById("circle-xaxis").setAttribute("x2", cx + H + 40);
+    document.getElementById("circle-xaxis").setAttribute("y2", cy);
+
+    document.getElementById("circle-yaxis").setAttribute("x1", cx);
+    document.getElementById("circle-yaxis").setAttribute("y1", cy - H - 40);
+    document.getElementById("circle-yaxis").setAttribute("x2", cx);
+    document.getElementById("circle-yaxis").setAttribute("y2", cy + H + 40);
+
+    document.getElementById("circle-outline").setAttribute("cx", cx);
+    document.getElementById("circle-outline").setAttribute("cy", cy);
+    document.getElementById("circle-outline").setAttribute("r", H);
+
+    document.getElementById("circle-wedge").setAttribute("d", sectorPath(cx, cy, H, 0, theta));
+
+    var Tc = pointOnCircle(cx, cy, H, theta);
+    var Fc = { x: Tc.x, y: cy };
+
+    document.getElementById("circle-drop").setAttribute("x1", Tc.x);
+    document.getElementById("circle-drop").setAttribute("y1", Tc.y);
+    document.getElementById("circle-drop").setAttribute("x2", Fc.x);
+    document.getElementById("circle-drop").setAttribute("y2", Fc.y);
+
+    document.getElementById("circle-adjacent").setAttribute("x1", cx);
+    document.getElementById("circle-adjacent").setAttribute("y1", cy);
+    document.getElementById("circle-adjacent").setAttribute("x2", Fc.x);
+    document.getElementById("circle-adjacent").setAttribute("y2", Fc.y);
+
+    document.getElementById("circle-opposite").setAttribute("x1", Fc.x);
+    document.getElementById("circle-opposite").setAttribute("y1", Fc.y);
+    document.getElementById("circle-opposite").setAttribute("x2", Tc.x);
+    document.getElementById("circle-opposite").setAttribute("y2", Tc.y);
+
+    document.getElementById("circle-radius").setAttribute("x1", cx);
+    document.getElementById("circle-radius").setAttribute("y1", cy);
+    document.getElementById("circle-radius").setAttribute("x2", Tc.x);
+    document.getElementById("circle-radius").setAttribute("y2", Tc.y);
+
+    var zeroLbl = document.getElementById("circle-zero-label");
+    zeroLbl.setAttribute("x", cx + H + 14);
+    zeroLbl.setAttribute("y", cy + 5);
+    zeroLbl.textContent = "0\u00B0";
+
+    var ninetyLbl = document.getElementById("circle-ninety-label");
+    ninetyLbl.setAttribute("x", cx - 12);
+    ninetyLbl.setAttribute("y", cy - H - 14);
+    ninetyLbl.textContent = "90\u00B0";
+
+    var circleLabelR = clamp(H * 0.5, 30, H - 15);
+    var circleLabelPos = pointOnCircle(cx, cy, circleLabelR, theta / 2);
+    var circleLabel = document.getElementById("circle-theta-label");
+    circleLabel.setAttribute("x", circleLabelPos.x - 10);
+    circleLabel.setAttribute("y", circleLabelPos.y + 5);
+    circleLabel.textContent = Math.round(theta) + "\u00B0";
+
+    var circleHandle = document.getElementById("circle-handle");
+    circleHandle.setAttribute("cx", Tc.x);
+    circleHandle.setAttribute("cy", Tc.y);
+    circleHandle.setAttribute("aria-valuenow", Math.round(theta));
+    circleHandle.setAttribute("aria-valuetext", Math.round(theta) + " degrees");
+
+    degValueCircle.textContent = Math.round(theta);
+
+    // ---- full-rotation view (0-360, shares center C and radius H) ----
+    document.getElementById("circlefull-xaxis").setAttribute("x1", cx - H - 40);
+    document.getElementById("circlefull-xaxis").setAttribute("y1", cy);
+    document.getElementById("circlefull-xaxis").setAttribute("x2", cx + H + 40);
+    document.getElementById("circlefull-xaxis").setAttribute("y2", cy);
+
+    document.getElementById("circlefull-yaxis").setAttribute("x1", cx);
+    document.getElementById("circlefull-yaxis").setAttribute("y1", cy - H - 40);
+    document.getElementById("circlefull-yaxis").setAttribute("x2", cx);
+    document.getElementById("circlefull-yaxis").setAttribute("y2", cy + H + 40);
+
+    document.getElementById("circlefull-outline").setAttribute("cx", cx);
+    document.getElementById("circlefull-outline").setAttribute("cy", cy);
+    document.getElementById("circlefull-outline").setAttribute("r", H);
+
+    document.getElementById("circlefull-wedge").setAttribute("d", sectorPath(cx, cy, H, 0, thetaFull));
+
+    // quadrant labels, fixed positions, independent of theta/H
+    var qR = 34;
+    setLabel("circlefull-q1-label", pointOnCircle(cx, cy, qR, 45), "I");
+    setLabel("circlefull-q2-label", pointOnCircle(cx, cy, qR, 135), "II");
+    setLabel("circlefull-q3-label", pointOnCircle(cx, cy, qR, 225), "III");
+    setLabel("circlefull-q4-label", pointOnCircle(cx, cy, qR, 315), "IV");
+
+    // cardinal tick labels, just outside the circle, independent of theta
+    setLabel("circlefull-0-label", { x: cx + H + 14, y: cy + 5 }, "0\u00B0");
+    setLabel("circlefull-90-label", { x: cx - 14, y: cy - H - 14 }, "90\u00B0");
+    setLabel("circlefull-180-label", { x: cx - H - 34, y: cy + 5 }, "180\u00B0");
+    setLabel("circlefull-270-label", { x: cx - 18, y: cy + H + 22 }, "270\u00B0");
+
+    var Tf = pointOnCircle(cx, cy, H, thetaFull);
+    document.getElementById("circlefull-radius").setAttribute("x1", cx);
+    document.getElementById("circlefull-radius").setAttribute("y1", cy);
+    document.getElementById("circlefull-radius").setAttribute("x2", Tf.x);
+    document.getElementById("circlefull-radius").setAttribute("y2", Tf.y);
+
+    var fullLabelR = clamp(H * 0.5, 30, H - 15);
+    var fullLabelPos = pointOnCircle(cx, cy, fullLabelR, thetaFull / 2);
+    var fullLabel = document.getElementById("circlefull-theta-label");
+    fullLabel.setAttribute("x", fullLabelPos.x - 12);
+    fullLabel.setAttribute("y", fullLabelPos.y + 5);
+    fullLabel.textContent = Math.round(thetaFull) + "\u00B0";
+
+    var fullHandle = document.getElementById("circlefull-handle");
+    fullHandle.setAttribute("cx", Tf.x);
+    fullHandle.setAttribute("cy", Tf.y);
+    fullHandle.setAttribute("aria-valuenow", Math.round(thetaFull));
+    fullHandle.setAttribute("aria-valuetext", Math.round(thetaFull) + " degrees");
+
+    degValueFull.textContent = Math.round(thetaFull);
+    rangeFull.value = thetaFull;
+
+    // ---- radians view (0-360, shares center C and radius H) ----
+    document.getElementById("rad-xaxis").setAttribute("x1", cx - H - 40);
+    document.getElementById("rad-xaxis").setAttribute("y1", cy);
+    document.getElementById("rad-xaxis").setAttribute("x2", cx + H + 40);
+    document.getElementById("rad-xaxis").setAttribute("y2", cy);
+
+    document.getElementById("rad-yaxis").setAttribute("x1", cx);
+    document.getElementById("rad-yaxis").setAttribute("y1", cy - H - 40);
+    document.getElementById("rad-yaxis").setAttribute("x2", cx);
+    document.getElementById("rad-yaxis").setAttribute("y2", cy + H + 40);
+
+    document.getElementById("rad-outline").setAttribute("cx", cx);
+    document.getElementById("rad-outline").setAttribute("cy", cy);
+    document.getElementById("rad-outline").setAttribute("r", H);
+
+    document.getElementById("rad-wedge").setAttribute("d", sectorPath(cx, cy, H, 0, thetaRad));
+
+    // the reference radius (the "ruler"), fixed at 0 degrees
+    var refPoint = pointOnCircle(cx, cy, H, 0);
+    document.getElementById("rad-reference").setAttribute("x1", cx);
+    document.getElementById("rad-reference").setAttribute("y1", cy);
+    document.getElementById("rad-reference").setAttribute("x2", refPoint.x);
+    document.getElementById("rad-reference").setAttribute("y2", refPoint.y);
+    setLabel("rad-reference-label", { x: cx + H * 0.35, y: cy - 10 }, "1 radius");
+
+    // the first-radian arc: exactly one radius-length of arc, by construction
+    var oneRadDeg = radToDeg(1);
+    document.getElementById("rad-first-arc").setAttribute("d", arcStroke(cx, cy, H, 0, oneRadDeg));
+
+    // whole-radian tick marks around the circle (only as many as fit before 360deg)
+    var ticksG = document.getElementById("rad-ticks");
+    ticksG.innerHTML = "";
+    for (var n = 1; n <= 6; n++) {
+      var tickDeg = radToDeg(n);
+      if (tickDeg >= 360) break;
+      var inner = pointOnCircle(cx, cy, H - 10, tickDeg);
+      var outer = pointOnCircle(cx, cy, H + 10, tickDeg);
+      var labelPt = pointOnCircle(cx, cy, H + 26, tickDeg);
+      ticksG.innerHTML +=
+        '<line x1="' + inner.x.toFixed(1) + '" y1="' + inner.y.toFixed(1) +
+        '" x2="' + outer.x.toFixed(1) + '" y2="' + outer.y.toFixed(1) +
+        '" stroke="#8b8996" stroke-width="2"></line>' +
+        '<text x="' + (labelPt.x - 4).toFixed(1) + '" y="' + (labelPt.y + 4).toFixed(1) +
+        '" class="mono" fill="#8b8996" font-size="13">' + n + '</text>';
+    }
+
+    var Tr = pointOnCircle(cx, cy, H, thetaRad);
+    document.getElementById("rad-radius").setAttribute("x1", cx);
+    document.getElementById("rad-radius").setAttribute("y1", cy);
+    document.getElementById("rad-radius").setAttribute("x2", Tr.x);
+    document.getElementById("rad-radius").setAttribute("y2", Tr.y);
+
+    var radLabelR = clamp(H * 0.5, 30, H - 15);
+    var radLabelPos = pointOnCircle(cx, cy, radLabelR, thetaRad / 2);
+    var radLabel = document.getElementById("rad-theta-label");
+    radLabel.setAttribute("x", radLabelPos.x - 14);
+    radLabel.setAttribute("y", radLabelPos.y + 5);
+    radLabel.textContent = radWholeMark ? (radWholeMark + " rad") : piFraction(thetaRad);
+
+    var radHandle = document.getElementById("rad-handle");
+    radHandle.setAttribute("cx", Tr.x);
+    radHandle.setAttribute("cy", Tr.y);
+    radHandle.setAttribute("aria-valuenow", Math.round(thetaRad));
+    radHandle.setAttribute("aria-valuetext", Math.round(thetaRad) + " degrees");
+
+    radFraction.textContent = radWholeMark ? String(radWholeMark) : piFraction(thetaRad);
+    var decimalRad = degToRad(thetaRad);
+    radCaption.textContent = Math.round(thetaRad) + "\u00B0 \u00B7 \u2248 " + decimalRad.toFixed(4) + " rad";
+    rangeRad.value = thetaRad;
+  }
+
+  function setLabel(id, pos, text) {
+    var el = document.getElementById(id);
+    el.setAttribute("x", pos.x);
+    el.setAttribute("y", pos.y);
+    el.textContent = text;
+  }
+
+  function setTheta(raw, opts) {
+    opts = opts || {};
+    var t = clamp(raw, 0, 90);
+    if (snapOn && !opts.exact) t = nearestBenchmark(t, BENCHMARKS);
+    theta = t;
+    chips.forEach(function (c) {
+      c.setAttribute("aria-pressed", String(Number(c.dataset.deg) === Math.round(theta)));
+    });
+    render();
+  }
+
+  function setThetaFull(raw, opts) {
+    opts = opts || {};
+    var t = clamp(raw, 0, 360);
+    if (snapOnFull && !opts.exact) t = nearestBenchmark(t, BENCHMARKS_FULL);
+    thetaFull = t;
+    chipsFull.forEach(function (c) {
+      c.setAttribute("aria-pressed", String(Number(c.dataset.deg) === Math.round(thetaFull)));
+    });
+    render();
+  }
+
+  function setThetaRad(raw, opts) {
+    opts = opts || {};
+    var t = clamp(raw, 0, 360);
+
+    var nearestN = null, nearestDist = Infinity;
+    RADIAN_MARK_DEGS.forEach(function (markDeg, idx) {
+      var d = Math.abs(markDeg - t);
+      if (d < nearestDist) { nearestDist = d; nearestN = idx + 1; }
+    });
+
+    if (!opts.exact && nearestDist <= RADIAN_SNAP_TOLERANCE) {
+      t = RADIAN_MARK_DEGS[nearestN - 1];
+      radWholeMark = nearestN;
+    } else {
+      radWholeMark = null;
+      if (snapOnRad && !opts.exact) t = nearestBenchmark(t, RADIAN_BENCHMARKS);
+    }
+
+    thetaRad = t;
+    chipsRad.forEach(function (c) {
+      c.setAttribute("aria-pressed", String(Number(c.dataset.deg) === Math.round(thetaRad)));
+    });
+    render();
+  }
+
+  // ---- input: range slider ----
+  range.addEventListener("input", function () {
+    setTheta(Number(range.value));
+  });
+
+  // ---- input: full-turn range slider ----
+  rangeFull.addEventListener("input", function () {
+    setThetaFull(Number(rangeFull.value));
+  });
+
+  // ---- input: size slider (changes scale only — theta is untouched) ----
+  sizeRange.addEventListener("input", function () {
+    setSize(Number(sizeRange.value));
+    render();
+  });
+
+  // ---- input: chips ----
+  chips.forEach(function (c) {
+    c.addEventListener("click", function () {
+      setTheta(Number(c.dataset.deg), { exact: true });
+    });
+  });
+
+  // ---- input: full-turn chips ----
+  chipsFull.forEach(function (c) {
+    c.addEventListener("click", function () {
+      setThetaFull(Number(c.dataset.deg), { exact: true });
+    });
+  });
+
+  // ---- input: radians range slider ----
+  rangeRad.addEventListener("input", function () {
+    setThetaRad(Number(rangeRad.value));
+  });
+
+  // ---- input: radians chips ----
+  chipsRad.forEach(function (c) {
+    c.addEventListener("click", function () {
+      setThetaRad(Number(c.dataset.deg), { exact: true });
+    });
+  });
+
+  // ---- input: snap toggle ----
+  snapToggle.addEventListener("change", function () {
+    snapOn = snapToggle.checked;
+    setTheta(theta);
+  });
+
+  // ---- input: full-turn snap toggle ----
+  snapToggleFull.addEventListener("change", function () {
+    snapOnFull = snapToggleFull.checked;
+    setThetaFull(thetaFull);
+  });
+
+  // ---- input: radians snap toggle ----
+  snapToggleRad.addEventListener("change", function () {
+    snapOnRad = snapToggleRad.checked;
+    setThetaRad(thetaRad);
+  });
+
+  // ---- input: drag the handle ----
+  function svgPoint(evt, svgEl) {
+    var rect = svgEl.getBoundingClientRect();
+    var vb = svgEl.viewBox.baseVal;
+    var px = (evt.clientX - rect.left) * (vb.width / rect.width);
+    var py = (evt.clientY - rect.top) * (vb.height / rect.height);
+    return { x: px, y: py };
+  }
+
+  function paramsFromPoint(p) {
+    var dx = p.x - A.x, dy = p.y - A.y;
+    return {
+      theta: Math.atan2(-dy, -dx) * 180 / Math.PI,
+      size: Math.hypot(dx, dy)
+    };
+  }
+
+  function setSize(raw) {
+    H = clamp(raw, SIZE_MIN, SIZE_MAX);
+    sizeRange.value = H;
+  }
+
+  function pointerDown(evt) {
+    dragging = true;
+    handle.style.cursor = "grabbing";
+    evt.preventDefault();
+  }
+  function pointerMove(evt) {
+    if (!dragging) return;
+    var p = svgPoint(evt, svg);
+    var params = paramsFromPoint(p);
+    setSize(params.size);
+    setTheta(params.theta);
+  }
+  function pointerUp() {
+    dragging = false;
+    handle.style.cursor = "grab";
+  }
+
+  handle.addEventListener("pointerdown", pointerDown);
+  window.addEventListener("pointermove", pointerMove);
+  window.addEventListener("pointerup", pointerUp);
+
+  handle.addEventListener("keydown", function (evt) {
+    if (evt.shiftKey && (evt.key === "ArrowUp" || evt.key === "ArrowRight")) { setSize(H + 5); render(); evt.preventDefault(); return; }
+    if (evt.shiftKey && (evt.key === "ArrowDown" || evt.key === "ArrowLeft")) { setSize(H - 5); render(); evt.preventDefault(); return; }
+    if (evt.key === "ArrowUp" || evt.key === "ArrowRight") { setTheta(theta + 1); evt.preventDefault(); }
+    if (evt.key === "ArrowDown" || evt.key === "ArrowLeft") { setTheta(theta - 1); evt.preventDefault(); }
+  });
+
+  // ---- input: drag the circle's terminal-point handle ----
+  var circleSvg = document.getElementById("circle-svg");
+  var circleHandleEl = document.getElementById("circle-handle");
+  var circleDragging = false;
+
+  function thetaFromCirclePoint(p) {
+    var dx = p.x - C.x, dy = p.y - C.y;
+    return Math.atan2(-dy, dx) * 180 / Math.PI;
+  }
+
+  circleHandleEl.addEventListener("pointerdown", function (evt) {
+    circleDragging = true;
+    circleHandleEl.style.cursor = "grabbing";
+    evt.preventDefault();
+  });
+  window.addEventListener("pointermove", function (evt) {
+    if (!circleDragging) return;
+    var p = svgPoint(evt, circleSvg);
+    setTheta(thetaFromCirclePoint(p));
+  });
+  window.addEventListener("pointerup", function () {
+    circleDragging = false;
+    circleHandleEl.style.cursor = "grab";
+  });
+  circleHandleEl.addEventListener("keydown", function (evt) {
+    if (evt.key === "ArrowUp" || evt.key === "ArrowRight") { setTheta(theta + 1); evt.preventDefault(); }
+    if (evt.key === "ArrowDown" || evt.key === "ArrowLeft") { setTheta(theta - 1); evt.preventDefault(); }
+  });
+
+  // ---- input: drag the full-turn handle (0-360, same center C, same radius H) ----
+  var circlefullSvg = document.getElementById("circlefull-svg");
+  var circlefullHandleEl = document.getElementById("circlefull-handle");
+  var circlefullDragging = false;
+
+  function thetaFromCircleFullPoint(p) {
+    var dx = p.x - C.x, dy = p.y - C.y;
+    var deg = Math.atan2(-dy, dx) * 180 / Math.PI;
+    if (deg < 0) deg += 360;
+    return deg;
+  }
+
+  circlefullHandleEl.addEventListener("pointerdown", function (evt) {
+    circlefullDragging = true;
+    circlefullHandleEl.style.cursor = "grabbing";
+    evt.preventDefault();
+  });
+  window.addEventListener("pointermove", function (evt) {
+    if (!circlefullDragging) return;
+    var p = svgPoint(evt, circlefullSvg);
+    setThetaFull(thetaFromCircleFullPoint(p));
+  });
+  window.addEventListener("pointerup", function () {
+    circlefullDragging = false;
+    circlefullHandleEl.style.cursor = "grab";
+  });
+  circlefullHandleEl.addEventListener("keydown", function (evt) {
+    if (evt.key === "ArrowUp" || evt.key === "ArrowRight") { setThetaFull(thetaFull + 1); evt.preventDefault(); }
+    if (evt.key === "ArrowDown" || evt.key === "ArrowLeft") { setThetaFull(thetaFull - 1); evt.preventDefault(); }
+  });
+
+  // ---- input: drag the radians handle (0-360, same center C, same radius H) ----
+  var radSvg = document.getElementById("radians-svg");
+  var radHandleEl = document.getElementById("rad-handle");
+  var radDragging = false;
+
+  radHandleEl.addEventListener("pointerdown", function (evt) {
+    radDragging = true;
+    radHandleEl.style.cursor = "grabbing";
+    evt.preventDefault();
+  });
+  window.addEventListener("pointermove", function (evt) {
+    if (!radDragging) return;
+    var p = svgPoint(evt, radSvg);
+    setThetaRad(thetaFromCircleFullPoint(p));
+  });
+  window.addEventListener("pointerup", function () {
+    radDragging = false;
+    radHandleEl.style.cursor = "grab";
+  });
+  radHandleEl.addEventListener("keydown", function (evt) {
+    if (evt.key === "ArrowUp" || evt.key === "ArrowRight") { setThetaRad(thetaRad + 1); evt.preventDefault(); }
+    if (evt.key === "ArrowDown" || evt.key === "ArrowLeft") { setThetaRad(thetaRad - 1); evt.preventDefault(); }
+  });
+
+  // ---- tab switching ----
+  var tabButtons = Array.prototype.slice.call(document.querySelectorAll('nav.tabs button[data-view]'));
+  tabButtons.forEach(function (btn) {
+    if (btn.disabled) return;
+    btn.addEventListener("click", function () {
+      var view = btn.dataset.view;
+      tabButtons.forEach(function (b) { b.setAttribute("aria-selected", String(b === btn)); });
+      document.querySelectorAll(".view").forEach(function (el) {
+        var views = el.dataset.view.split(" ");
+        el.classList.toggle("active", views.indexOf(view) !== -1);
+      });
+    });
+  });
+
+  // ---- mode toggle ----
+  var modeToggle = document.getElementById("mode-toggle");
+  modeToggle.addEventListener("click", function () {
+    var on = modeToggle.getAttribute("aria-pressed") !== "true";
+    modeToggle.setAttribute("aria-pressed", String(on));
+    modeToggle.textContent = "Presenter Mode: " + (on ? "On" : "Off");
+    document.documentElement.style.setProperty("--scale", on ? "1.35" : "1");
+    document.body.classList.toggle("presenter", on);
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>
